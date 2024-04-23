@@ -83,8 +83,8 @@ app.delete('/api/articulos/:id',(req,res)=>{
 });
 
 /*--------------------Obtener cliente--------------------*/
-app.get('/api/clientes',(req,res)=>{
-    pool.query('SELECT * FROM clientes',(error,filas)=>{
+app.get('/api/cliente',(req,res)=>{
+    pool.query('SELECT * FROM cliente',(error,filas)=>{
         if(error){
             throw error;
         }else{
@@ -95,8 +95,8 @@ app.get('/api/clientes',(req,res)=>{
 
 /*--------------------Obtener cliente--------------------*/
 /*Busca un cliente por su email*/
-app.get('/api/clientes/:email',(req,res)=>{
-    pool.query('SELECT * FROM clientes  WHERE email= ?',[req.params.email],(error,fila)=>{
+app.get('/api/cliente/:email',(req,res)=>{
+    pool.query('SELECT * FROM cliente  WHERE email= ?',[req.params.email],(error,fila)=>{
         if(error){
             throw error;
         }else{
@@ -106,7 +106,7 @@ app.get('/api/clientes/:email',(req,res)=>{
 });
 
 /*--------------------Registrar cliente--------------------*/
-app.post('/api/clientes',(req,res)=>{
+app.post('/api/cliente',(req,res)=>{
     let data={
         nombreCompleto:req.body.nombreCompleto,
         email:req.body.email,
@@ -116,7 +116,7 @@ app.post('/api/clientes',(req,res)=>{
         estado:req.body.estado,
         direccion:req.body.direccion
     };
-    const sql="INSERT INTO clientes SET ?";
+    const sql="INSERT INTO cliente SET ?";
     pool.query(sql,data,function(error,results){
         if(error){
             throw error;
@@ -128,10 +128,10 @@ app.post('/api/clientes',(req,res)=>{
 });
 
 /*--------------------Modificar cliente--------------------*/
-app.put('/api/clientes/:email',(req,res)=>{
+app.put('/api/cliente/:email',(req,res)=>{
     let { nombreCompleto, tipDoc, numDoc, estado, direccion } = req.body;
     let email = req.params.email;
-    const sql = "UPDATE clientes SET  nombreCompleto= ?, tipDoc= ?, numDoc= ?, estado= ?, direccion= ? WHERE email= ?";
+    const sql = "UPDATE cliente SET  nombreCompleto= ?, tipDoc= ?, numDoc= ?, estado= ?, direccion= ? WHERE email= ?";
     pool.query(sql,[nombreCompleto, tipDoc, numDoc, estado, direccion, email],function(error,results){
         if(error){
             throw error;
@@ -142,8 +142,8 @@ app.put('/api/clientes/:email',(req,res)=>{
 });
 
 /*--------------------Eliminar cliente--------------------*/
-app.delete('/api/clientes/:id',(req,res)=>{
-    pool.query("DELETE FROM clientes WHERE id= ?" ,[req.params.id], function(error,fila){
+app.delete('/api/cliente/:id',(req,res)=>{
+    pool.query("DELETE FROM cliente WHERE id= ?" ,[req.params.id], function(error,fila){
         if(error){
             throw error;
         }else{
@@ -153,8 +153,8 @@ app.delete('/api/clientes/:id',(req,res)=>{
 })
 
 /*--------------------Obtener producto--------------------*/
-app.get('/api/productos',(req,res)=>{
-    pool.query('SELECT * FROM productos',(error,filas)=>{
+app.get('/api/producto',(req,res)=>{
+    pool.query('SELECT * FROM producto',(error,filas)=>{
         if(error){
             throw error;
         }else{
@@ -165,16 +165,16 @@ app.get('/api/productos',(req,res)=>{
 
 /*--------------------Obtener producto--------------------*/
 /*Busca un producto por su id*/
-app.get('/api/productos/:id',(req,res)=>{
-    pool.query('SELECT * FROM productos WHERE id= ?',[req.params.id], (error,fila)=>{
+app.get('/api/producto/:id',(req,res)=>{
+    pool.query('SELECT * FROM producto WHERE id= ?',[req.params.id], (error,fila)=>{
         if(error) throw error;
         res.send(fila);
     })
 });
 
 /*--------------------Registrar producto--------------------*/
-app.post('/api/productos',(req,res)=>{
-    const sql = "INSERT INTO productos SET ?";
+app.post('/api/producto',(req,res)=>{
+    const sql = "INSERT INTO producto SET ?";
     const producto = {
         nombre: req.body.nombre,
         descripcion: req.body.descripcion,
@@ -189,10 +189,10 @@ app.post('/api/productos',(req,res)=>{
 });
 
 /*--------------------Modificar producto--------------------*/
-app.put('/api/productos/:id', (req, res) => {
+app.put('/api/producto/:id', (req, res) => {
     let { nombre, descripcion, precio, nombreImagen } = req.body;
     let id = req.params.id;
-    const sql = "UPDATE productos SET  nombre= ?, descripcion= ?,precio= ?, nombreImagen= ? WHERE id= ?";
+    const sql = "UPDATE producto SET  nombre= ?, descripcion= ?,precio= ?, nombreImagen= ? WHERE id= ?";
     pool.query(sql, [nombre, descripcion, precio, nombreImagen, id], (error, results) => {
         if(error)  throw error;
         res.send(results)
@@ -200,11 +200,11 @@ app.put('/api/productos/:id', (req, res) => {
 })
 
 /*--------------------Modificar Stock--------------------*/
-app.put('/api/productosStock/:id', (req, res) => {
+app.put('/api/productoStock/:id', (req, res) => {
     let { stock } = req.body;
     console.log(stock);
     let id = req.params.id;
-    const sql = "UPDATE productos SET  stock= ? WHERE id= ?";
+    const sql = "UPDATE producto SET  stock= ? WHERE id= ?";
     pool.query(sql, [ stock, id ], (error, results) => {
         if(error)  throw error;
         res.send(results);
@@ -213,8 +213,8 @@ app.put('/api/productosStock/:id', (req, res) => {
 
 
 /*--------------------Eliminar producto--------------------*/
-app.delete('/api/productos/:id', (req, res) => {
-    pool.query('DELETE FROM productos WHERE id = ?',[req.params.id],function(error,results){
+app.delete('/api/producto/:id', (req, res) => {
+    pool.query('DELETE FROM producto WHERE id = ?',[req.params.id],function(error,results){
         if(error){
             throw error;
         }else{
@@ -227,9 +227,9 @@ app.delete('/api/productos/:id', (req, res) => {
 
 /*--------------------Crear pedido--------------------*/
 app.post('/api/pedidos', (req, res) => {
-    const productosJson = req.body.productos;
+    const productoJson = req.body.producto;
     const sql = "INSERT INTO pedidos (pedido) VALUES (?)";
-    pool.query(sql, [productosJson], (error, results) => {
+    pool.query(sql, [productoJson], (error, results) => {
       if (error) {
         res.status(500).json({ error: 'Error interno del servidor' });
       } else {
