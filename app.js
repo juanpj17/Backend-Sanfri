@@ -1,16 +1,26 @@
-import express from 'express';
-import pkg from 'pg';
-import cors from 'cors';
-
-const { Pool } = pkg
-const pool = new Pool({
-    connectionString: 'postgresql://postgres:LNEeBQnRllDjcoDTJzQOQcnccQHqJHYP@monorail.proxy.rlwy.net:11208/railway'
-});
-const app = express();
-
+var express=require('express');
+var mysql=require('mysql');
+var cors=require('cors');
+var app=express();
 app.use(express.json());
 app.use(cors());
+app.use(express.json());
 
+var conexion=mysql.createConnection({
+    host:'sql10.freesqldatabase.com',
+    user:'sql10714755',
+    password:'zwlHZSPBe6',
+    database:'sql10714755',
+    port:'3306',
+ });
+
+ conexion.connect(function(error){
+    if(error){
+        throw error;
+    }else{
+        console.log('Conexion exitosa');
+    }
+});
  
 app.get('/',function(req,res){
     res.send('Ruta Inicio');
@@ -18,7 +28,7 @@ app.get('/',function(req,res){
  
 /*--------------------Obtener articulo--------------------*/
  app.get('/api/articulos',(req,res)=>{
-    pool.query('SELECT * FROM articulos',(error,filas)=>{
+    conexion.query('SELECT * FROM articulos',(error,filas)=>{
         if(error){
             throw error;
         }else{
@@ -30,7 +40,7 @@ app.get('/',function(req,res){
 /*--------------------Obtener articulo--------------------*/
 /*Busca un articulo por su id*/
 app.get('/api/articulos/:id',(req,res)=>{
-    pool.query('SELECT * FROM articulos  WHERE id= ?',[req.params.id],(error,fila)=>{
+    conexion.query('SELECT * FROM articulos  WHERE id= ?',[req.params.id],(error,fila)=>{
         if(error){
             throw error;
         }else{
@@ -47,7 +57,7 @@ app.post('/api/articulos',(req,res)=>{
         stock:req.body.stock
     };
     const sql="INSERT INTO articulos SET ?";
-    pool.query(sql,data,function(error,results){
+    conexion.query(sql,data,function(error,results){
         if(error){
             throw error;
         }else{
@@ -62,7 +72,7 @@ app.put('/api/articulos/:id',(req,res)=>{
     let id=req.params.id;
     let { descripcion, precio, stock } = req.body;
     let sql="UPDATE articulos SET  descripcion= ?, precio= ?,stock= ? WHERE id= ?";
-    pool.query(sql,[descripcion,precio,stock,id],function(error,results){
+    conexion.query(sql,[descripcion,precio,stock,id],function(error,results){
         if(error){
             throw error;
         }else{
@@ -73,7 +83,7 @@ app.put('/api/articulos/:id',(req,res)=>{
 
 /*--------------------Eliminar articulo--------------------*/
 app.delete('/api/articulos/:id',(req,res)=>{
-    pool.query('DELETE FROM articulos WHERE id=?',[req.params.id],function(error,filas){
+    conexion.query('DELETE FROM articulos WHERE id=?',[req.params.id],function(error,filas){
         if(error){
             throw error;
         }else{
@@ -83,8 +93,8 @@ app.delete('/api/articulos/:id',(req,res)=>{
 });
 
 /*--------------------Obtener cliente--------------------*/
-app.get('/api/cliente',(req,res)=>{
-    pool.query('SELECT * FROM cliente',(error,filas)=>{
+app.get('/api/clientes',(req,res)=>{
+    conexion.query('SELECT * FROM clientes',(error,filas)=>{
         if(error){
             throw error;
         }else{
@@ -95,8 +105,8 @@ app.get('/api/cliente',(req,res)=>{
 
 /*--------------------Obtener cliente--------------------*/
 /*Busca un cliente por su email*/
-app.get('/api/cliente/:email',(req,res)=>{
-    pool.query('SELECT * FROM cliente  WHERE email= ?',[req.params.email],(error,fila)=>{
+app.get('/api/clientes/:email',(req,res)=>{
+    conexion.query('SELECT * FROM clientes  WHERE email= ?',[req.params.email],(error,fila)=>{
         if(error){
             throw error;
         }else{
@@ -106,7 +116,7 @@ app.get('/api/cliente/:email',(req,res)=>{
 });
 
 /*--------------------Registrar cliente--------------------*/
-app.post('/api/cliente',(req,res)=>{
+app.post('/api/clientes',(req,res)=>{
     let data={
         nombreCompleto:req.body.nombreCompleto,
         email:req.body.email,
@@ -116,8 +126,8 @@ app.post('/api/cliente',(req,res)=>{
         estado:req.body.estado,
         direccion:req.body.direccion
     };
-    const sql="INSERT INTO cliente SET ?";
-    pool.query(sql,data,function(error,results){
+    const sql="INSERT INTO clientes SET ?";
+    conexion.query(sql,data,function(error,results){
         if(error){
             throw error;
         }else{
@@ -128,11 +138,11 @@ app.post('/api/cliente',(req,res)=>{
 });
 
 /*--------------------Modificar cliente--------------------*/
-app.put('/api/cliente/:email',(req,res)=>{
+app.put('/api/clientes/:email',(req,res)=>{
     let { nombreCompleto, tipDoc, numDoc, estado, direccion } = req.body;
     let email = req.params.email;
-    const sql = "UPDATE cliente SET  nombreCompleto= ?, tipDoc= ?, numDoc= ?, estado= ?, direccion= ? WHERE email= ?";
-    pool.query(sql,[nombreCompleto, tipDoc, numDoc, estado, direccion, email],function(error,results){
+    const sql = "UPDATE clientes SET  nombreCompleto= ?, tipDoc= ?, numDoc= ?, estado= ?, direccion= ? WHERE email= ?";
+    conexion.query(sql,[nombreCompleto, tipDoc, numDoc, estado, direccion, email],function(error,results){
         if(error){
             throw error;
         }else{
@@ -142,8 +152,8 @@ app.put('/api/cliente/:email',(req,res)=>{
 });
 
 /*--------------------Eliminar cliente--------------------*/
-app.delete('/api/cliente/:id',(req,res)=>{
-    pool.query("DELETE FROM cliente WHERE id= ?" ,[req.params.id], function(error,fila){
+app.delete('/api/clientes/:id',(req,res)=>{
+    conexion.query("DELETE FROM clientes WHERE id= ?" ,[req.params.id], function(error,fila){
         if(error){
             throw error;
         }else{
@@ -153,8 +163,8 @@ app.delete('/api/cliente/:id',(req,res)=>{
 })
 
 /*--------------------Obtener producto--------------------*/
-app.get('/api/producto',(req,res)=>{
-    pool.query('SELECT * FROM producto',(error,filas)=>{
+app.get('/api/productos',(req,res)=>{
+    conexion.query('SELECT * FROM productos',(error,filas)=>{
         if(error){
             throw error;
         }else{
@@ -165,16 +175,16 @@ app.get('/api/producto',(req,res)=>{
 
 /*--------------------Obtener producto--------------------*/
 /*Busca un producto por su id*/
-app.get('/api/producto/:id',(req,res)=>{
-    pool.query('SELECT * FROM producto WHERE id= ?',[req.params.id], (error,fila)=>{
+app.get('/api/productos/:id',(req,res)=>{
+    conexion.query('SELECT * FROM productos WHERE id= ?',[req.params.id], (error,fila)=>{
         if(error) throw error;
         res.send(fila);
     })
 });
 
 /*--------------------Registrar producto--------------------*/
-app.post('/api/producto',(req,res)=>{
-    const sql = "INSERT INTO producto SET ?";
+app.post('/api/productos',(req,res)=>{
+    const sql = "INSERT INTO productos SET ?";
     const producto = {
         nombre: req.body.nombre,
         descripcion: req.body.descripcion,
@@ -182,30 +192,30 @@ app.post('/api/producto',(req,res)=>{
         precio: req.body.precio,
         nombreImagen: req.body.nombreImagen
     } 
-        pool.query(sql, producto, (error, results) => {
+        conexion.query(sql, producto, (error, results) => {
             if(error) throw error;
             res.send(results);
         })
 });
 
 /*--------------------Modificar producto--------------------*/
-app.put('/api/producto/:id', (req, res) => {
+app.put('/api/productos/:id', (req, res) => {
     let { nombre, descripcion, precio, nombreImagen } = req.body;
     let id = req.params.id;
-    const sql = "UPDATE producto SET  nombre= ?, descripcion= ?,precio= ?, nombreImagen= ? WHERE id= ?";
-    pool.query(sql, [nombre, descripcion, precio, nombreImagen, id], (error, results) => {
+    const sql = "UPDATE productos SET  nombre= ?, descripcion= ?,precio= ?, nombreImagen= ? WHERE id= ?";
+    conexion.query(sql, [nombre, descripcion, precio, nombreImagen, id], (error, results) => {
         if(error)  throw error;
         res.send(results)
     })
 })
 
 /*--------------------Modificar Stock--------------------*/
-app.put('/api/productoStock/:id', (req, res) => {
+app.put('/api/productosStock/:id', (req, res) => {
     let { stock } = req.body;
     console.log(stock);
     let id = req.params.id;
-    const sql = "UPDATE producto SET  stock= ? WHERE id= ?";
-    pool.query(sql, [ stock, id ], (error, results) => {
+    const sql = "UPDATE productos SET  stock= ? WHERE id= ?";
+    conexion.query(sql, [ stock, id ], (error, results) => {
         if(error)  throw error;
         res.send(results);
     })
@@ -213,8 +223,8 @@ app.put('/api/productoStock/:id', (req, res) => {
 
 
 /*--------------------Eliminar producto--------------------*/
-app.delete('/api/producto/:id', (req, res) => {
-    pool.query('DELETE FROM producto WHERE id = ?',[req.params.id],function(error,results){
+app.delete('/api/productos/:id', (req, res) => {
+    conexion.query('DELETE FROM productos WHERE id = ?',[req.params.id],function(error,results){
         if(error){
             throw error;
         }else{
@@ -227,9 +237,9 @@ app.delete('/api/producto/:id', (req, res) => {
 
 /*--------------------Crear pedido--------------------*/
 app.post('/api/pedidos', (req, res) => {
-    const productoJson = req.body.producto;
+    const productosJson = req.body.productos;
     const sql = "INSERT INTO pedidos (pedido) VALUES (?)";
-    pool.query(sql, [productoJson], (error, results) => {
+    conexion.query(sql, [productosJson], (error, results) => {
       if (error) {
         res.status(500).json({ error: 'Error interno del servidor' });
       } else {
@@ -240,7 +250,7 @@ app.post('/api/pedidos', (req, res) => {
 
   /*--------------------Obtener pedidos--------------------*/
 app.get('/api/pedidos',(req,res)=>{
-    pool.query('SELECT * FROM pedidos',(error,filas)=>{
+    conexion.query('SELECT * FROM pedidos',(error,filas)=>{
         if(error){
             throw error;
         }else{
@@ -251,7 +261,7 @@ app.get('/api/pedidos',(req,res)=>{
 
 /*--------------------Eliminar pedido--------------------*/
 app.delete('/api/pedidos/:id', (req, res) => {
-    pool.query('DELETE FROM pedidos WHERE id = ?',[req.params.id],function(error,results){
+    conexion.query('DELETE FROM pedidos WHERE id = ?',[req.params.id],function(error,results){
         if(error){
             throw error;
         }else{
